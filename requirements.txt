@@ -2,6 +2,8 @@ flask
 pandas
 numpy
 scikit-learn
-
 python-dateutil
-maturin
+flask-socketio
+flask-cors
+eventlet
+gunicorn
