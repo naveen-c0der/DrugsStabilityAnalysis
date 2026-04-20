@@ -34,6 +34,17 @@
             --accent-red: #ef4444;
             /* Red */
         }
+        
+        :root.light-theme {
+            --primary-color: #4f46e5;
+            --secondary-color: #2563eb;
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --accent-green: #059669;
+            --accent-red: #dc2626;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -42,6 +53,7 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         /* Glassmorphism utility */
@@ -138,6 +150,19 @@
                     <div class="system-status">
                         <span class="status-dot"></span> System Operational
                     </div>
+                    <button id="themeToggleBtn" title="Toggle Light/Dark Mode" style="background: var(--card-bg); border: 1px solid rgba(124, 58, 237, 0.3); color: var(--text-color); border-radius: 8px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.2)); transition: 0.3s;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
                 </div>
             </header>
 
@@ -302,6 +327,30 @@
 
     <div id="toast-container"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Light Theme Toggle Logic
+        const themeBtn = document.getElementById('themeToggleBtn');
+        const root = document.documentElement;
+        
+        // Check local storage for theme
+        if (localStorage.getItem('theme') === 'light') {
+            root.classList.add('light-theme');
+        }
+
+        themeBtn.addEventListener('click', () => {
+            root.classList.toggle('light-theme');
+            const isLight = root.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            
+            // Re-render charts to adapt to new text colors (optional)
+            if (typeof Chart !== 'undefined') {
+                Chart.helpers.each(Chart.instances, function(instance) {
+                    // Quick update to let ChartJS pickup CSS variables if used
+                    instance.update();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

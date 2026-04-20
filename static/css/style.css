@@ -15,6 +15,16 @@
     --font-main: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+:root.light-theme {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --accent-glow: rgba(139, 92, 246, 0.15);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.85);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -31,6 +41,11 @@ body {
     display: flex;
     position: relative;
     -webkit-font-smoothing: antialiased;
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+body.light-theme {
+    background: radial-gradient(circle at 50% 10%, #e2e8f0 0%, var(--bg-primary) 100%);
 }
 
 /* Custom Scrollbar */
@@ -243,7 +258,7 @@ body {
 .top-bar h1 {
     font-size: 1.6rem;
     font-weight: 700;
-    color: #f8fafc;
+    color: var(--text-primary);
     letter-spacing: -0.5px;
 }
 
@@ -384,7 +399,7 @@ body {
     font-size: 34px;
     font-weight: 800;
     margin: 2px 0;
-    color: #fff;
+    color: var(--text-primary);
     letter-spacing: -1px;
 }
 
@@ -444,7 +459,7 @@ body {
 .card-header h3 {
     font-weight: 600;
     font-size: 1.1rem;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 #mainTrendChart {
