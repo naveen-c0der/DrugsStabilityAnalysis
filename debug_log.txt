@@ -1,0 +1,8 @@
+CHECK 1: stability_data.csv found.
+   Rows: 373
+   Sample Study IDs: ['ST-001', 'ST-002', 'ST-003', 'ST-004', 'ST-005', 'ST-006', 'ST-007', 'ST-008', 'ST-009', 'ST-010', 'ST-011', 'ST-012', 'ST-013', 'ST-014', 'ST-015', 'ST-016', 'ST-017', 'ST-018', 'ST-019', 'ST-020', 'ST-021', 'ST-022', 'ST-023', 'ST-024', 'ST-025', 'ST-026', 'ST-027', 'ST-028', 'ST-029', 'ST-030', 'ST-031', 'ST-032', 'ST-033', 'ST-034', 'ST-035', 'ST-036', 'ST-037', 'ST-038', 'ST-039', 'ST-040', 'ST-041', 'ST-042', 'ST-043', 'ST-044', 'ST-045', 'ST-046', 'ST-047', 'ST-048', 'ST-049', 'ST-050']
+--------------------
+CHECK 2: Model initialized. Studies found internally: ['ST-001', 'ST-002', 'ST-003', 'ST-004', 'ST-005', 'ST-006', 'ST-007', 'ST-008', 'ST-009', 'ST-010', 'ST-011', 'ST-012', 'ST-013', 'ST-014', 'ST-015', 'ST-016', 'ST-017', 'ST-018', 'ST-019', 'ST-020', 'ST-021', 'ST-022', 'ST-023', 'ST-024', 'ST-025', 'ST-026', 'ST-027', 'ST-028', 'ST-029', 'ST-030', 'ST-031', 'ST-032', 'ST-033', 'ST-034', 'ST-035', 'ST-036', 'ST-037', 'ST-038', 'ST-039', 'ST-040', 'ST-041', 'ST-042', 'ST-043', 'ST-044', 'ST-045', 'ST-046', 'ST-047', 'ST-048', 'ST-049', 'ST-050', 'ST001']
+--------------------
+CHECK 3: API Check
+   API Connection failed: HTTPConnectionPool(host='127.0.0.1', port=5000): Max retries exceeded with url: /api/studies (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001E37BA7C050>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))

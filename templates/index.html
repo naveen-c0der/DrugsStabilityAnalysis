@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StabilAi — Predictive Stability & OOT Alerting System</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        /* Embedding critical CSS to ensure immediate load of layout foundation */
+        :root {
+            --primary-color: #6366f1;
+            /* Indigo */
+            --secondary-color: #3b82f6;
+            /* Blue */
+            --bg-color: #0f172a;
+            /* Slate 900 */
+            --card-bg: rgba(30, 41, 59, 0.7);
+            /* Slate 800 with opacity */
+            --text-color: #f8fafc;
+            /* Slate 50 */
+            --text-muted: #94a3b8;
+            /* Slate 400 */
+            --accent-green: #10b981;
+            /* Emerald */
+            --accent-red: #ef4444;
+            /* Red */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-activity">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <h2>Stabil<span class="highlight">Ai</span></h2>
+            </div>
+
+            <ul class="nav-links">
+                <li class="active" data-tab="data-evaluation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Data Evaluation
+                </li>
+                <li data-tab="stability">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    Stability
+                </li>
+                <li data-tab="new-study">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    New Study
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="avatar">NS</div>
+                <div class="user-info">
+                    <span class="name">Naveen S</span>
+                    <span class="role">Lead Scientist</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area" id="printContent">
+            <!-- Hidden Print Header -->
+            <div id="printHeader"
+                style="display: none; padding-bottom: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); text-align: center;">
+                <h1 style="color: #a78bfa; font-size: 2.2rem; margin: 0; font-weight: 800;">StabilAi Official Report
+                </h1>
+                <p style="color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Comprehensive Predictive Analytics &
+                    Data Evaluation</p>
+                <p style="color: #6366f1; font-weight: 600;">Generated on: <span id="printDateStr"></span></p>
+            </div>
+
+            <header class="top-bar glass-panel">
+                <h1 id="pageTitle">Data Evaluation Overview</h1>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button id="downloadPdfBtn" class="btn-primary"
+                        style="padding: 8px 15px; font-size: 0.9em; display: flex; align-items: center; gap: 5px; cursor: pointer; border: none; border-radius: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download Report
+                    </button>
+                    <div class="system-status">
+                        <span class="status-dot"></span> System Operational
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sections -->
+            <div id="data-evaluation" class="view-section active">
+                <div class="grid-layout">
+                    <!-- Quick Stats Cards -->
+                    <div class="card glass-panel stat-card">
+                        <div class="stat-icon p-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Study</h3>
+                            <select id="studySelect" class="study-dropdown">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card glass-panel stat-card">
+                        <div class="stat-icon p-purple">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>OOT Alerts</h3>
+                            <p class="stat-value" id="oot-count">0</p>
+                            <span class="stat-trend negative">Requires Attention</span>
+                        </div>
+                    </div>
+
+                    <div class="card glass-panel stat-card">
+                        <div class="stat-icon p-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Avg Shelf Life</h3>
+                            <p class="stat-value">24m</p>
+                            <span class="stat-trend neutral">Stable</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Chart Area -->
+                    <div class="card glass-panel chart-container-large">
+                        <div class="card-header">
+                            <h3>Potency Trend Analysis</h3>
+                            <div class="card-actions">
+                                <select class="time-filter">
+                                    <option>Last 6 Months</option>
+                                    <option>Last Year</option>
+                                    <option>All Time</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="position: relative; height: 400px; width: 100%;">
+                            <canvas id="mainTrendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Alerts -->
+                    <div class="card glass-panel alerts-container">
+                        <h3>Recent Alerts</h3>
+                        <ul class="alert-list" id="recent-alerts">
+                            <li class="empty-state">No active alerts</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Moved Data Table to Data Evaluation Tab -->
+                <div class="card glass-panel" style="margin-top: 30px;">
+                    <h3 id="detailedDataLogTitle">Detailed Data Log</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Time (Months)</th>
+                                    <th>Potency (%)</th>
+                                    <th>Impurities (%)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="new-study" class="view-section">
+                <div class="form-container glass-panel">
+                    <h2>Input New Study Data</h2>
+                    <p class="subtitle">Enter the latest results to update the model and check for OOT.</p>
+
+                    <form id="stabilityForm">
+                        <div class="form-group">
+                            <label>Study ID</label>
+                            <input type="text" id="studyIdInput" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Time Point (Months)</label>
+                                <input type="number" id="timeInput" placeholder="e.g. 3, 6, 9" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Potency (%)</label>
+                                <input type="number" step="0.1" id="potencyInput" placeholder="95.0 - 105.0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Impurities (%)</label>
+                            <input type="number" step="0.01" id="impurityInput" placeholder="Limit: 1.0%" required>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            Analyze & Save
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <div id="analysisResult" class="result-box hidden">
+                        <!-- Dynamic Results will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="stability" class="view-section">
+                <div class="card glass-panel predictive-card">
+                    <h3>Shelf Life Prediction Model</h3>
+                    <div class="prediction-display">
+                        <div class="prediction-value" id="shelfLifeValue">Calculating...</div>
+                        <p>Total Estimated Shelf Life (Reaches 90.0% Potency)</p>
+                        <div class="prediction-value" id="remainingShelfLifeValue"
+                            style="font-size: 28px; color: #ec4899; margin-top: 15px;">--</div>
+                        <p>Remaining Safe Months <span style="font-size: 12px; color: #94a3b8;">(from last test
+                                count)</span></p>
+                    </div>
+                    <div style="height: 400px; width: 100%; margin-top: 20px;">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
